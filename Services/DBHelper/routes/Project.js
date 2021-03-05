@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Project = mongoose.model('projects')
 
 module.exports = (app) => {
-    // Get project details
+    // Get project details. id is the project id of the document.
     app.get('/api/getProject/:id', async (req,res) => {
         try{
             const projectID = req.params.id;
@@ -44,7 +44,7 @@ module.exports = (app) => {
             });
         }
         catch(error) {
-            return res.status(500).send({ resp : error });
+            return;
         }
     })
 
@@ -57,6 +57,7 @@ module.exports = (app) => {
      *  description : String,
      * }
      */
+    // Note that the addition of the project and the updating of the user profile should be done separate. Make sure to do that!
 
     app.post('/api/addProject', async (req,res) => {
         try{
@@ -68,7 +69,7 @@ module.exports = (app) => {
             );
         }
         catch(error){
-            return res.status(500).send({ resp : error });
+            return;
         }
     });
 }

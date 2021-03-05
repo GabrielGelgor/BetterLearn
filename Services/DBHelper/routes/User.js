@@ -37,7 +37,7 @@ module.exports = (app) => {
             return res.status(404).send({ resp : `User ${userID} not found` }); // If not, return 404
         }
         catch(error){
-            return res.status(500).send({ resp : error });
+            return;//res.status(500).send({ resp : error });
         }
     })
 
@@ -78,7 +78,7 @@ module.exports = (app) => {
             );
         }
         catch(error){
-            res.status(500).send({ resp : error });
+            return;//res.status(500).send({ resp : error });
         }
     })
 
