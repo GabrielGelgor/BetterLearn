@@ -11,7 +11,7 @@ const projectSchema = new Schema({
 
     score : { type : Number, default : 0 },
 
-    contributors : { type : [String], default : [] },
+    contributors : { type : [String], default : [] }, // Non-owner contributors.
 
     description : { type : String, default : "" },
 

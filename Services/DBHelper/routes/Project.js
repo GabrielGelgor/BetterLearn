@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Project = mongoose.model('projects')
 
 module.exports = (app) => {
-    // Get project details. id is the project id of the document.
+    // Get project details. id is the id of the document.
     app.get('/api/getProject/:id', async (req,res) => {
         try{
             const projectID = req.params.id;
