@@ -4,6 +4,11 @@ const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const keys = require('./config/keys');
 
+mongoose.connect(keys.MONGO_URI);
+require('./models/Comment');
+require('./models/Project');
+require('./models/User');
+
 const app = express();
 app.use(bodyParser.json());
 app.use(
@@ -13,12 +18,7 @@ app.use(
     })
 );
 
-mongoose.connect(keys.MONGO_URI);
-require('./models/Comment');
-require('./models/Project');
-require('./models/User');
-
-require('./routes/User')(app);
-require('./routes/Project')(app);
+app.use(require('./routes/User').router);
+app.use(require('./routes/Project').router);
 
 app.listen(5555);
