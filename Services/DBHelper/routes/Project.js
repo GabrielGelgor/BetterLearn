@@ -3,6 +3,11 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 const Project = mongoose.model('projects')
+const zmq = require("zeromq");
+const sock = new zmq.Publisher();
+
+await sock.bind("tcp://127.0.0.1:3000");
+console.log("Publisher bound to port 3000");
 
 // Get project details. id is the id of the document.
 router.get('/api/getProject/:id', async (req,res) => {
@@ -69,6 +74,8 @@ router.post('/api/addProject', async (req,res) => {
         await new Project(req.body).save(
             (err, doc) => {
                 if (err) return res.status(500).send({ resp : err });
+                console.log("sending a multipart message envelope");
+                await sock.send(["POSTS", JSON.stringify(doc)]);
                 return res.status(200).send({ resp : doc });
             }
         );
