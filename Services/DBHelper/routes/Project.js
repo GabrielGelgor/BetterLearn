@@ -2,12 +2,18 @@ const express = require('express');
 const router = express.Router();
 
 const mongoose = require('mongoose');
-const Project = mongoose.model('projects')
+const Project = mongoose.model('projects');
+
 const zmq = require("zeromq");
 const sock = new zmq.Publisher();
 
-await sock.bind("tcp://127.0.0.1:3000");
+sock.bind("tcp://127.0.0.1:3000");
 console.log("Publisher bound to port 3000");
+
+const elasticsearch = require('elasticsearch');
+const client = new elasticsearch.Client({
+    hosts : ["http://localhost:9200"],
+});
 
 // Get project details. id is the id of the document.
 router.get('/api/getProject/:id', async (req,res) => {
@@ -71,19 +77,28 @@ router.delete('/api/deleteProject/:id', async (req,res) => {
 
 router.post('/api/addProject', async (req,res) => {
     try{
-        await new Project(req.body).save(
+        let exists = await new Project(req.body).save(
             (err, doc) => {
                 if (err) return res.status(500).send({ resp : err });
-                console.log("sending a multipart message envelope");
-                await sock.send(["POSTS", JSON.stringify(doc)]);
                 return res.status(200).send({ resp : doc });
             }
         );
+        
+        console.log("sending a multipart message envelope");
+        if (exists) await sock.send(["POSTS", JSON.stringify(exists)]);
     }
     
     catch(error){
         return;
     }
 });
+
+router.get('/search', async (req,res) => {
+    const search = req.query.q;
+
+    let result = await client.search({ index : "projects", q : "*", type : "projects"})
+
+    res.send(result)
+})
 
 module.exports.router = router;
