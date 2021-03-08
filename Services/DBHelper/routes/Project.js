@@ -84,8 +84,10 @@ router.post('/api/addProject', async (req,res) => {
             }
         );
         
-        console.log("sending a multipart message envelope");
-        if (exists) await sock.send(["POSTS", JSON.stringify(exists)]);
+        if (exists){ 
+            await sock.send(["POSTS", JSON.stringify(exists)]);
+            console.log("sending a multipart message envelope");
+        }
     }
     
     catch(error){
@@ -96,7 +98,11 @@ router.post('/api/addProject', async (req,res) => {
 router.get('/search', async (req,res) => {
     const search = req.query.q;
 
-    let result = await client.search({ index : "projects", q : "*", type : "projects"})
+    console.log(client.search())
+
+    let result = await client.count({ 
+        index : "projects", 
+    });
 
     res.send(result)
 })

@@ -273,3 +273,34 @@ id : The document ID for the project.
     "resp": {Error Object}
 }
 ```
+---
+## Search
+### /search/courses
+**Type:** POST
+**Description:** Search udemy for specific courses. Returns top 10 results.
+**Body:**
+```json
+ {
+    "term" : String,           // The search term for your query
+ }
+```
+**Response (Success):**
+```json
+{
+    "resp" : [
+        {
+            "title" : String,
+            "url" : String,
+            "thumbnail" : String,
+            "description" : String
+        },
+        ...
+    ] 
+}
+```
+**Response (Fail, 500):**
+```json
+{
+    "resp": {Error Object}
+}
+```
