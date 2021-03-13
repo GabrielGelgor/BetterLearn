@@ -1,5 +1,6 @@
 import { Client } from "elasticsearch";
 import * as zmq from "zeromq";
+import axios from "axios";
 
 const ELASTIC_SEARCH_ENDPOINT = "http://localhost:9200";
 const PROJECT_INDEX = "projects";
@@ -30,24 +31,41 @@ client.indices.create(
   },
   function (error, response, status) {
     if (error) {
-      console.log(error);
+      // console.log(error);
     } else {
       console.log("created a new index", response);
     }
   }
 );
 
-// client
-// .search({ index: PROJECT_INDEX, q: "testSearching", type: PROJECT_INDEX })
-// .then((results) => {
-//   console.log(JSON.stringify(results, null, 2));
-// })
-// .catch((err) => {
-//   console.log(err);
-// });
+const populateElasticSearch = async () => {
+  let response = await axios.get(`http://localhost:5555/api/getProjects`);
+  console.log(JSON.stringify(response.data));
+  return response.data.map((item) => {
+    // console.log(item);
+    client.index(
+      {
+        index: PROJECT_INDEX,
+        id: item._id,
+        type: PROJECT_INDEX,
+        body: {
+          title: item.title,
+          descriptions: item.description,
+          comments: item.comments,
+        },
+      },
+      (err: any, resp: any) => {
+        // console.log(err);
+      }
+    );
+    return;
+  });
+};
+populateElasticSearch();
 
 async function run() {
   const sock = new zmq.Subscriber();
+  console.log("RUNNING inside zmq");
 
   sock.connect(ZERO_MQ_ENDPOINT);
   sock.subscribe(ZERO_MQ_TOPIC);
@@ -55,6 +73,7 @@ async function run() {
   for await (const [topic, msg] of sock) {
     var buf = msg.toString();
     const json = JSON.parse(buf);
+    console.log(json);
     client.index(
       {
         index: PROJECT_INDEX,
@@ -67,7 +86,7 @@ async function run() {
         },
       },
       (err: any, resp: any) => {
-        console.log(err);
+        // console.log(err);
       }
     );
   }
