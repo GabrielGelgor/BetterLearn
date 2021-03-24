@@ -3,26 +3,29 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 
+//.js pages that are loaded
 import Header from './Header';
 import Landing from './Landing';
-const Dashboard = () => <h2>Dashboard</h2>;
-const dashboardNew = () => <h2>dashboardNew</h2>;
+import Dashboard from './Dashboard';
+import UserInfo from './UserInfo';
+//const UserInfo = () => <h2>UserInfo</h2>;
 
-
+//fetches the users state on whether ther logged in or not
 class App extends Component {
   componentDidMount() {
     this.props.fetchUser();
   }
 
+//decide which .js files to load/render depending on the route/path
   render() {
     return (
       <div className="container">
         <BrowserRouter>
           <div>
-            <Header />
+            <Header/>
             <Route exact path="/" component={Landing} />
             <Route exact path="/dashboard" component={Dashboard} />
-            <Route path="/dashboard/new" component={dashboardNew} />
+            <Route path="/userinfo" component={UserInfo} />
           </div>
         </BrowserRouter>
       </div>

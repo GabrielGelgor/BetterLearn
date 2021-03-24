@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom'
 
+//checks state of user (whether ther logged in or not) and acts accordingly
 class Header extends Component {
   renderContent() {
     switch (this.props.auth) {
@@ -9,13 +10,16 @@ class Header extends Component {
         return;
       case false:
         return <li><a href="/auth/google">Login With Google</a></li>;
+
+      //if logged in render/return the following
       default:
-        return <div><li><a href="/dashboard">Dashboard</a></li><li><a href="/api/logout">Logout</a></li></div>;
+        return <div><li><a href="/dashboard">Dashboard</a></li><li><a href="/userinfo">UserInfo</a></li><li><a href="/api/logout">Logout</a></li></div>;
     }
   }
 
   render() {
-    //console.log(this.props);
+    // uncomment below line to google inspect console to view user data being passed
+    console.log(this.props);
     return (
       <nav>
         <div className="nav-wrapper">

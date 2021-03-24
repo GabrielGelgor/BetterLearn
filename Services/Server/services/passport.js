@@ -22,12 +22,15 @@ passport.use(
       //search.date
       //variablename.data
 
+
+      //takes the User ID and makes it into a cookie
       passport.serializeUser((currentUser, done) => {
 
         done(null, currentUser.id);
       });
 
 
+      // takes the id from the cookie and uses it to get the whole user object
       passport.deserializeUser((id, done) => {
 
         axios.get(`http://localhost:5555/api/getUser/${id}`)
