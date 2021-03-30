@@ -1,0 +1,39 @@
+# Authentication Deployment
+# Handles application authentication
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: auth
+
+  template:
+    metadata:
+      labels:
+        component: auth
+
+    spec:
+      containers:
+        - name: auth
+          image: gabrielgelgor/authentication
+          #imagePullPolicy: Never
+          ports:
+            - name: port5000
+              containerPort: 5000
+---
+# Authentican ClusterIP
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: auth
+  ports:
+    - name: port5000
+      port: 5000
+      targetPort: 5000

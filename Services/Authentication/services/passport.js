@@ -33,7 +33,7 @@ passport.use(
       // takes the id from the cookie and uses it to get the whole user object
       passport.deserializeUser((id, done) => {
 
-        axios.get(`http://localhost:5555/api/getUser/${id}`)
+        axios.get(`http://dbhelper-cluster-ip-service:5555/api/getUser/${id}`)
           .then(user => {
             let currentUser = user.data;
             done(null, currentUser);
@@ -44,7 +44,7 @@ passport.use(
 
       //Saving the response code from the getUser endpoint
       responseStatus = null;
-      await axios.get(`http://localhost:5555/api/getUser/${profile.id}`)
+      await axios.get(`http://dbhelper-cluster-ip-service:5555/api/getUser/${profile.id}`)
         .then(({ response }) => {})
         .catch(({ response }) => { 
           responseStatus = response.status;
@@ -59,7 +59,7 @@ passport.use(
         console.log('userfound!!!!!!!!!!!')
 
         //make a user object
-        let currentUser = await axios.get(`http://localhost:5555/api/getUser/${profile.id}`);
+        let currentUser = await axios.get(`http://dbhelper-cluster-ip-service:5555/api/getUser/${profile.id}`);
         currentUser = currentUser.data;
 
         //after done call is executed user will be logged in
@@ -71,14 +71,14 @@ passport.use(
         console.log('user not found, but dw we gonna make u an account')
 
         //creating account using /api/addUser endpoint and sending it the required data
-        await axios.post('http://localhost:5555/api/addUser', {
+        await axios.post('http://dbhelper-cluster-ip-service:5555/api/addUser', {
             id: profile.id,
             userName: profile.emails[0].value
         })
         .finally(console.log("made a user"));
 
         //make a user object
-        let currentUser = await axios.get(`http://localhost:5555/api/getUser/${profile.id}`);
+        let currentUser = await axios.get(`http://dbhelper-cluster-ip-service:5555/api/getUser/${profile.id}`);
         currentUser = currentUser.data;
 
         //after done call is executed user will be logged in

@@ -7,12 +7,12 @@ const Project = mongoose.model("projects");
 const zmq = require("zeromq");
 const sock = new zmq.Publisher();
 
-sock.bind("tcp://127.0.0.1:3000");
+sock.bind("tcp://search-worker-cluster-ip-service:3000");
 console.log("Publisher bound to port 3000");
 
 const elasticsearch = require("elasticsearch");
 const client = new elasticsearch.Client({
-  hosts: ["http://localhost:9200"],
+  hosts: ["http://search-cluster-ip-service:9200"],
 });
 const PROJECT_INDEX = "projects";
 

@@ -1,0 +1,39 @@
+# Client deployment
+# Front end of our project
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: client-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: web
+
+  template:
+    metadata:
+      labels:
+        component: web
+    spec:
+      containers:
+        - name: client
+          #imagePullPolicy: Never
+          image: gabrielgelgor/client
+          ports:
+            - name: port4444
+              containerPort: 4444
+
+---
+# Client ClusterIP
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: web
+  ports:
+    - name: port4444
+      port: 4444
+      targetPort: 4444

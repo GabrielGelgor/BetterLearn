@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations: # Additional config options that specify higher level configuration around the ingress option that it creates
+    kubernetes.io/ingress.class: nginx
+    # nginx.ingress.kubernetes.io/use-regex: 'true'
+    # nginx.ingress.kubernetes.io/rewrite-target: /$1 # Removes the /api from the beginning of api requests we make.
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: client-cluster-ip-service
+              servicePort: 3000
+
+          - path: /auth
+            backend:
+              serviceName: auth-cluster-ip-service
+              servicePort: 5000
+
+          - path: /search
+            backend:
+              serviceName: dbhelper-cluster-ip-service
+              servicePort: 5555
+
+          - path: /api
+            backend:
+              serviceName: dbhelper-cluster-ip-service
+              servicePort: 5555
