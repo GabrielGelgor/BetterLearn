@@ -1,5 +1,5 @@
-# Authentication Deployment
-# Handles application authentication
+# Search service worker Deployment
+# Handles set up of new elasticsearch set-up, as well as updating.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,12 +19,12 @@ spec:
       containers:
         - name: search-worker
           image: gabrielgelgor/search-worker
-          #imagePullPolicy: Never
+          imagePullPolicy: Never
           ports:
             - name: port3000
               containerPort: 3000
 ---
-# Authentican ClusterIP
+# Search Worker ClusterIP
 apiVersion: v1
 kind: Service
 metadata:

@@ -19,7 +19,7 @@ spec:
       containers:
         - name: databasehelper
           image: gabrielgelgor/dbhelper
-          #imagePullPolicy: Never
+          imagePullPolicy: Never
           ports:
             - name: port5555
               containerPort: 5555

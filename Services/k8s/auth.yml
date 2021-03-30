@@ -19,7 +19,7 @@ spec:
       containers:
         - name: auth
           image: gabrielgelgor/authentication
-          #imagePullPolicy: Never
+          imagePullPolicy: Never
           ports:
             - name: port5000
               containerPort: 5000

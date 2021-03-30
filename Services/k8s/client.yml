@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: client
-          #imagePullPolicy: Never
+          imagePullPolicy: Never
           image: gabrielgelgor/client
           ports:
             - name: port4444
