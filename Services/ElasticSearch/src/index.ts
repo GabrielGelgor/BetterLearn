@@ -4,7 +4,7 @@ import axios from "axios";
 
 const ELASTIC_SEARCH_ENDPOINT = "http://search-cluster-ip-service:9200";
 const PROJECT_INDEX = "projects";
-const ZERO_MQ_ENDPOINT = "tcp://127.0.0.1:3000";
+const ZERO_MQ_ENDPOINT = "tcp://dbhelper-cluster-ip-service:3000";
 const ZERO_MQ_TOPIC = "POSTS";
 
 const client = new Client({
