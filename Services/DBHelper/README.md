@@ -137,23 +137,37 @@ id : User Google ID. Should be collected from session token.
 ---
 ## Projects
 ### /api/getProject/:id
-**Type:** GET
+**Type:** POST
 **Description:** Gets a project's details.
 **Parameters:**
 ```json
 id : The document ID for the project.
 ```
+**Body:**
+```json
+{
+    user : String                   // The User ID of the calling user
+}
 **Response (Success):**
 ```json
 {
-    "score": Number,                
-    "contributors": [String],       // Google IDs of non-owner contributors
-    "description": String,
-    "comments": [commentSchema],
-    "_id": String,                  // Document ID
-    "title": String,
-    "owner": String,                // Google ID of owner
-    "__v": Number
+    "resp" : {
+        "score": Number,                
+        "contributors": [String],       // Google IDs of non-owner  contributors
+        "description": String,
+        "comments": [commentSchema],
+        "_id": String,                  // Document ID
+        "title": String,
+        "owner": String,                // Google ID of owner
+        "__v": Number
+    },
+    "vote" : [                          // The vote history of this user. Returns an empty array if never voted before.
+        {
+            "voter": String,
+            "vote": Number
+        }
+    ]
+
 }
 ```
 **Response (Fail, 404):**
@@ -243,7 +257,11 @@ id : The document ID for the project.
 **Body:**
 ```json
 {
-    [Whatever project fields you wish to update with their new value]
+    [Whatever project fields you wish to update with their new value],
+    "vote" : {
+        "vote" : Number,                 // 1 for upvote, -1 for down
+        "voter" : String                 // UserID for the voter
+    }
 }
 ```
 **Response (Success):**
