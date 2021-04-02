@@ -1,0 +1,39 @@
+# Search service worker Deployment
+# Handles set up of new elasticsearch set-up, as well as updating.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-worker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: search-worker
+
+  template:
+    metadata:
+      labels:
+        component: search-worker
+
+    spec:
+      containers:
+        - name: search-worker
+          image: gabrielgelgor/search-worker
+          imagePullPolicy: Never
+          #ports:
+          #  - name: port3000
+          #    containerPort: 3000
+---
+# Search Worker ClusterIP
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: search-worker-cluster-ip-service
+#spec:
+#  type: ClusterIP
+#  selector:
+#    component: search-worker
+#  ports:
+#    - name: port3000
+#      port: 3000
+#      targetPort: 3000

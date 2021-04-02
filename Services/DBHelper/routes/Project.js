@@ -12,7 +12,7 @@ console.log("Publisher bound to port 3000");
 
 const elasticsearch = require("elasticsearch");
 const client = new elasticsearch.Client({
-  hosts: ["http://localhost:9200"],
+  hosts: ["http://search-cluster-ip-service:9200"],
 });
 const PROJECT_INDEX = "projects";
 

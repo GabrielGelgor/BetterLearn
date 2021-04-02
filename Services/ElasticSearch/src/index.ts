@@ -2,9 +2,9 @@ import { Client } from "elasticsearch";
 import * as zmq from "zeromq";
 import axios from "axios";
 
-const ELASTIC_SEARCH_ENDPOINT = "http://localhost:9200";
+const ELASTIC_SEARCH_ENDPOINT = "http://search-cluster-ip-service:9200";
 const PROJECT_INDEX = "projects";
-const ZERO_MQ_ENDPOINT = "tcp://127.0.0.1:3000";
+const ZERO_MQ_ENDPOINT = "tcp://dbhelper-cluster-ip-service:3000";
 const ZERO_MQ_TOPIC = "POSTS";
 
 const client = new Client({
@@ -39,7 +39,7 @@ client.indices.create(
 );
 
 const populateElasticSearch = async () => {
-  let response = await axios.get(`http://localhost:5555/api/getProjects`);
+  let response = await axios.get(`http://dbhelper-cluster-ip-service:5555/api/getProjects`);
   console.log(JSON.stringify(response.data));
   return response.data.map((item) => {
     // console.log(item);

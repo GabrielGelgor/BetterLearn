@@ -19,5 +19,5 @@ app.use(passport.session());
 
 app.use(require('./routes/authRoutes').router);
 
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 app.listen(PORT);

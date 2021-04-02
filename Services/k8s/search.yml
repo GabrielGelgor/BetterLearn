@@ -1,0 +1,48 @@
+# ElasticSearch Deployment
+# Handles elasticsearch access
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: search
+
+  template:
+    metadata:
+      labels:
+        component: search
+
+    spec:
+      containers:
+        - name: search
+          image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
+          ports:
+            - name: port9200
+              containerPort: 9200
+            - name: port9300
+              containerPort: 9300
+
+          env:
+            - name: discovery.type
+              value: "single-node"
+
+---
+# Search ClusterIP
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: search
+  ports:
+    - name: port9200
+      port: 9200
+      targetPort: 9200
+    - name: port9300
+      port: 9300
+      targetPort: 9300
