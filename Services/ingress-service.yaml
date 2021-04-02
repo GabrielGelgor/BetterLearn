@@ -8,12 +8,13 @@ metadata:
     # nginx.ingress.kubernetes.io/rewrite-target: /$1 # Removes the /api from the beginning of api requests we make.
 spec:
   rules:
-    - http:
+    - host: better-learn.me
+      http:
         paths:
           - path: /
             backend:
               serviceName: client-cluster-ip-service
-              servicePort: 3000
+              servicePort: 4444
 
           - path: /auth
             backend:

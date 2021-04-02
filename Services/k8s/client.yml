@@ -2,7 +2,7 @@
 # Front end of our project
 apiVersion: apps/v1
 kind: Deployment
-metadata: 
+metadata:
   name: client-deployment
 spec:
   replicas: 1
@@ -30,7 +30,7 @@ kind: Service
 metadata:
   name: client-cluster-ip-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     component: web
   ports:
