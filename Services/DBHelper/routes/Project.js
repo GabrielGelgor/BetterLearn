@@ -69,7 +69,7 @@ router.post("/api/updateProject/:id", async (req, res) => {
       if (doc){
 
         // If successful, and there was a change in the vote
-        if (vote !== null){
+        if (typeof vote !== 'undefined'){
 
           let voterHistory = await Project.findOne(
             {_id: projectID},
