@@ -12,6 +12,19 @@ class CreateProject extends Component {
     this.getUser();
   }
 
+  updateUser(data) {
+    axios.post(`/api/updateUser/${this.state.user.id}`, data).then(
+      (response) => {
+        this.setState({
+          user: response.data.resp,
+        });
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
+
   createProject = (event) => {
     event.preventDefault();
     if (this.state.user) {
@@ -29,11 +42,16 @@ class CreateProject extends Component {
             added: true,
             project: response.data.resp,
           });
+          this.props.updateProjects();
         },
         (error) => {
           console.log(error);
         }
       );
+      const userData = {
+        projects: [...this.state.user.projects, this.state.project],
+      };
+      this.updateUser(userData);
     }
     document.querySelector("#create-form").reset();
   };
@@ -93,9 +111,6 @@ class CreateProject extends Component {
           <p className="regular-text">Title: {this.state.project.title}</p>
           <p className="regular-text">
             Description: {this.state.project.description}
-          </p>
-          <p className="regular-text">
-            Contributors: {this.state.project.contributors}
           </p>
           <p className="regular-text">
             Project Score: {this.state.project.score}

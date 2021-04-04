@@ -41,11 +41,25 @@ class SearchUdemy extends Component {
           <ul>
             {this.state.searchResults.map((item, index) => (
               <li key={index} className="techs-item">
-                <div className="project-card">
-                  <h4>{item.title}</h4>
-                  <p>{item.description}</p>
-                  <p>URL: {item.url}</p>
-                </div>
+                <a
+                  href={`https://udemy.com${item.url}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <div className="project-card row">
+                    <div className="col-sm-3">
+                      <img
+                        className="udemy-img"
+                        src={item.thumbnail}
+                        alt={item.title}
+                      />
+                    </div>
+                    <div className="col-sm-9">
+                      <h4>{item.title}</h4>
+                      <p>{item.description}</p>
+                    </div>
+                  </div>
+                </a>
               </li>
             ))}
           </ul>
