@@ -4,9 +4,14 @@ import { TiDelete } from "react-icons/ti";
 
 class Project extends Component {
   state = {
-    project: this.props.project,
+    projectID: this.props.project._id,
+    project: null,
     user: null,
+    projectOwner: null,
     projectUsers: [],
+    comments: [],
+    hasVoted: false,
+    vote: 0,
   };
 
   componentDidMount() {
@@ -22,30 +27,50 @@ class Project extends Component {
         ),
       };
       this.updateProject(data);
+      if (this.state.projects) {
+      }
     }
   };
 
   createComment = (event) => {
     event.preventDefault();
-    if (this.state.project) {
+    if (this.state.project && this.state.user) {
+      let commentData = {
+        comment: String(document.querySelector("#comment").value),
+        commenter: this.state.user.id,
+      };
       const data = {
-        comments: [
-          ...this.state.project.comments.slice(),
-          String(document.querySelector("#comment").value),
-        ],
+        comments: [...this.state.project.comments, commentData],
       };
       this.updateProject(data);
+      const previousComments = this.state.comments.slice();
+      const newComment = {
+        comment: commentData.comment,
+        commenter: this.state.user.userName,
+        commenterID: commentData.commenter,
+      };
+      this.setState({
+        comments: [...previousComments, newComment],
+      });
     }
     document.querySelector("#create-form").reset();
   };
 
   incrementScore = (event) => {
     event.preventDefault();
-    if (this.state.project) {
+    if (this.state.project && this.state.user) {
       const data = {
         score: this.state.project.score + 1,
+        voters: [
+          ...this.state.project.voters,
+          { voter: this.state.user.id, vote: 1 },
+        ],
       };
       this.updateProject(data);
+      this.setState({
+        hasVoted: true,
+        vote: 1,
+      });
     }
   };
 
@@ -54,8 +79,16 @@ class Project extends Component {
     if (this.state.project) {
       const data = {
         score: this.state.project.score - 1,
+        voters: [
+          ...this.state.project.voters,
+          { voter: this.state.user.id, vote: -1 },
+        ],
       };
       this.updateProject(data);
+      this.setState({
+        hasVoted: true,
+        vote: -1,
+      });
     }
   };
 
@@ -67,34 +100,66 @@ class Project extends Component {
         });
       },
       (error) => {
+        this.setState({
+          project: null,
+        });
         console.log(error);
       }
     );
   }
 
   updateUser(id, data) {
+    console.log("Sending this project list: ", data);
     axios.post(`/api/updateUser/${id}`, data).then(
       (response) => {
+        console.log(response.data.resp);
         this.setState({
           user: response.data.resp,
         });
       },
       (error) => {
+        this.setState({
+          user: null,
+        });
         console.log(error);
       }
     );
   }
 
   addProject = () => {
-    if (this.state.user && this.state.project) {
+    if (this.state.user && this.state.project && this.state.projectID) {
+      const contributorExists =
+        this.state.project.contributors.filter(
+          (item) => item === this.state.user.id
+        ).length > 0;
+      const projectExists =
+        this.state.user.projects.filter((item) => item === this.state.projectID)
+          .length > 0;
+
       const projectData = {
-        contributors: [...this.state.project.contributors, this.state.user.id],
+        contributors: contributorExists
+          ? this.state.project.contributors
+          : [...this.state.project.contributors, this.state.user.id],
       };
       const userData = {
-        projects: [...this.state.user.projects, this.state.project._id],
+        projects: projectExists
+          ? this.state.user.projects
+          : [...this.state.user.projects, this.state.projectID],
       };
+
       this.updateUser(this.state.user.id, userData);
       this.updateProject(projectData);
+      if (this.state.user && this.state.project) {
+        const isProjectUserAdded =
+          this.state.projectUsers.filter(
+            (item) => item.id === this.state.user.id
+          ).length > 0;
+        if (!isProjectUserAdded) {
+          this.setState({
+            projectUsers: [...this.state.projectUsers, this.state.user],
+          });
+        }
+      }
     }
   };
 
@@ -107,11 +172,18 @@ class Project extends Component {
       };
       const userData = {
         projects: this.state.user.projects.filter(
-          (item) => item !== this.state.project._id
+          (item) => item !== this.state.projectID
         ),
       };
       this.updateUser(this.state.user.id, userData);
       this.updateProject(projectData);
+      if (this.state.user && this.state.project) {
+        this.setState({
+          projectUsers: this.state.projectUsers.filter(
+            (item) => item.id !== this.state.user.id
+          ),
+        });
+      }
     }
   };
 
@@ -140,13 +212,26 @@ class Project extends Component {
   };
 
   getUser() {
-    axios.get("/auth/current_user").then((response) => {
-      axios.get(`/api/getUser/${response.data.id}`).then((response) => {
-        this.setState({
-          user: response.data,
-        });
-      });
-    });
+    axios.get("/auth/current_user").then(
+      (response) => {
+        axios.get(`/api/getUser/${response.data.id}`).then(
+          (response) => {
+            this.setState({
+              user: response.data,
+            });
+            if (this.state.projectID) {
+              this.getProject(this.state.projectID, response.data.id);
+            }
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   }
 
   getUsersByID(contributors) {
@@ -161,6 +246,32 @@ class Project extends Component {
           console.log(error);
         }
       )
+    );
+  }
+
+  getProject(id, data) {
+    axios.post(`/api/getProject/${id}`, data).then(
+      (response) => {
+        this.setState({
+          project: response.data.resp,
+        });
+        this.getUsersByID(response.data.resp.contributors);
+        this.getCommentUsers(response.data.resp.comments);
+        if (this.state.user) {
+          let voter = response.data.resp.voters.find(
+            (item) => item.voter === this.state.user.id
+          );
+          if (voter) {
+            this.setState({
+              hasVoted: true,
+              vote: voter.vote,
+            });
+          }
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
     );
   }
 
@@ -208,6 +319,43 @@ class Project extends Component {
     }
   }
 
+  getProjectOwner() {
+    if (this.state.project) {
+      axios.get(`/api/getUser/${this.state.project.owner}`).then(
+        (response) => {
+          this.setState({
+            projectOwner: response.data,
+          });
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    }
+  }
+
+  getCommentUsers(comments) {
+    comments.map((comment) => {
+      axios.get(`/api/getUser/${comment.commenter}`).then(
+        (response) => {
+          this.setState({
+            comments: [
+              ...this.state.comments,
+              {
+                comment: comment.comment,
+                commenter: response.data.userName,
+                commenterID: comment.commenter,
+              },
+            ],
+          });
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    });
+  }
+
   isOwner() {
     if (this.state.user && this.state.project) {
       return this.state.user.id === this.state.project.owner;
@@ -215,59 +363,96 @@ class Project extends Component {
     return false;
   }
 
+  dummy(event) {
+    event.preventDefault();
+  }
+
   renderContent() {
     if (this.state.project) {
+      if (!this.state.projectOwner) {
+        this.getProjectOwner();
+      }
       return (
         <div className="project-card">
           <div>
-            <h4>{this.state.project.title}</h4>
-            <div className="single-row">
-              {this.addRemovetoProfileButton()}
-              {this.deleteButton()}
-            </div>
+            <h3>{this.state.project.title}</h3>
           </div>
           <div className="mt-2">
             <p>{this.state.project.description}</p>
+            <p>
+              Project owner:{" "}
+              {this.state.projectOwner
+                ? this.state.projectOwner.userName
+                : "No owner found."}
+            </p>
             <div className="single-row">
               <small>Score: {this.state.project.score}</small>
               <button
-                onClick={this.incrementScore}
-                className="btn btn-primary btn-tech"
+                onClick={this.state.hasVoted ? this.dummy : this.incrementScore}
+                className={
+                  this.state.hasVoted && this.state.vote > 0
+                    ? "btn btn-primary btn-tech btn-green"
+                    : "btn btn-primary btn-tech"
+                }
               >
                 +
               </button>
               <button
-                onClick={this.decrementScore}
-                className="btn btn-primary btn-tech"
+                onClick={this.state.hasVoted ? this.dummy : this.decrementScore}
+                className={
+                  this.state.hasVoted && this.state.vote < 0
+                    ? "btn btn-primary btn-tech btn-red"
+                    : "btn btn-primary btn-tech"
+                }
               >
                 -
               </button>
             </div>
           </div>
-          <div className="mt-2">
-            <p>Contributors:</p>
+          <div className="mt-4">
+            <p>Project Contributors:</p>
+            {this.state.projectUsers.length === 0 ? (
+              <p>No contributors found.</p>
+            ) : (
+              <ul>
+                {this.state.projectUsers.map((item, index) => (
+                  <li className="techs-item" key={index}>
+                    {item.userName}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="single-row mt-4">
+              {this.addRemovetoProfileButton()}
+              {this.deleteButton()}
+            </div>
+            <p className="mt-4">Comments:</p>
             <ul>
-              {this.state.project.contributors.map((item, index) => (
-                <li className="techs-item" key={index}>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <p>Comments:</p>
-            <ul>
-              {this.state.project.comments.map((item, index) => (
-                <li className="techs-item comments-item" key={index}>
-                  {item}
-                  {this.isOwner() ? (
-                    <TiDelete
-                      size="1.0em"
-                      onClick={this.deleteComment.bind(this, index)}
-                    ></TiDelete>
-                  ) : (
-                    ""
-                  )}
-                </li>
-              ))}
+              {this.state.comments.length > 0
+                ? this.state.comments.map((item, index) => (
+                    <li className="techs-item comments-item" key={index}>
+                      <div className="row">
+                        <div className="col-sm-10">{item.comment}</div>
+                        <div className="col-sm-2">
+                          {item.commenterID === this.state.user.id ? (
+                            <TiDelete
+                              className="delete-icon"
+                              size="1.0em"
+                              onClick={this.deleteComment.bind(this, index)}
+                            ></TiDelete>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-sm-12">
+                          <small>Made by: {item.commenter}</small>
+                        </div>
+                      </div>
+                    </li>
+                  ))
+                : ""}
             </ul>
 
             <form
@@ -294,11 +479,7 @@ class Project extends Component {
         </div>
       );
     } else {
-      return (
-        <a className="btn btn-primary btn-tech" href="/allprojects">
-          No project found, go to all projects
-        </a>
-      );
+      return;
     }
   }
 

@@ -189,6 +189,14 @@ a:active {
   background-color: #866a6a;
 }
 
+.btn-green {
+  background-color: #34b934;
+}
+
+.btn-red {
+  background-color: #d13838;
+}
+
 .form-control {
   resize: none;
 }
@@ -206,6 +214,16 @@ a:active {
 
 .single-row > button {
   margin-left: 10px;
+}
+
+.udemy-img {
+  width: 100%;
+  height: auto;
+}
+
+.delete-icon {
+  width: 50%;
+  height: auto;
 }
 
 @media only screen and (min-width: 575px) and (max-width: 800px) {

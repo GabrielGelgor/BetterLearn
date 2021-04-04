@@ -19,10 +19,10 @@ class MyProjects extends Component {
           user: response.data,
         });
         this.state.user.projects.map((projectid) =>
-          axios.get(`/api/getProject/${projectid}`).then(
+          axios.post(`/api/getProject/${projectid}`, this.state.user.id).then(
             (response) => {
               this.setState({
-                projects: [...this.state.projects, response.data],
+                projects: [...this.state.projects, response.data.resp],
               });
             },
             (error) => {

@@ -13,9 +13,12 @@ import SearchUdemy from "./SearchUdemy";
 import SearchProjects from "./SearchProjects";
 
 class MainContent extends Component {
-  state = {
-    projects: null,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      projects: [],
+    };
+  }
 
   componentDidMount() {
     this.getProjects();
@@ -27,6 +30,11 @@ class MainContent extends Component {
         projects: response.data,
       });
     });
+  }
+
+  updateProjects() {
+    console.log(this.state);
+    this.getProjects();
   }
 
   render() {
@@ -50,8 +58,7 @@ class MainContent extends Component {
               children="Create Project"
             />
             <Route exact={true} path="/allprojects" children="All Projects" />
-            <Route exact={true} path="/allprojects" children="All Projects" />
-            {this.state.projects
+            {this.state.projects.length > 0
               ? this.state.projects.map((item, index) => (
                   <Route
                     key={index}
@@ -82,14 +89,16 @@ class MainContent extends Component {
             <Route
               exact={true}
               path="/createproject"
-              children={<CreateProject />}
+              children={
+                <CreateProject updateProjects={() => this.updateProjects()} />
+              }
             />
             <Route
               exact={true}
               path="/allprojects"
               children={<AllProjects />}
             />
-            {this.state.projects
+            {this.state.projects.length > 0
               ? this.state.projects.map((item, index) => (
                   <Route
                     key={index}

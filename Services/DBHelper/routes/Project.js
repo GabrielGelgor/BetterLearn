@@ -36,17 +36,18 @@ router.post("/api/getProject/:id", async (req, res) => {
       if (err) return res.status(500).send({ resp: err });
       if (doc) {
         let existingVote = await Project.findOne(
-          {_id: projectID},
-          {voters:
-            {$elemMatch:
-              {
-                voter : {$eq : userID}
-              }
-            }
-          });
+          { _id: projectID },
+          {
+            voters: {
+              $elemMatch: {
+                voter: { $eq: userID },
+              },
+            },
+          }
+        );
 
-        return res.status(200).send({resp : doc, vote : existingVote.voters})
-      };
+        return res.status(200).send({ resp: doc, vote: existingVote.voters });
+      }
       return res.status(404).send({ resp: `Project ${projectID} not found` });
     });
   } catch (error) {
@@ -61,51 +62,58 @@ router.post("/api/updateProject/:id", async (req, res) => {
     const projectID = req.params.id;
     const vote = req.body.vote;
 
-    await Project.findByIdAndUpdate(projectID, { ...req.body }, async (err, doc) => {
-      if (err)
-        return res
-          .status(500)
-          .send({ resp: "Error in query, check fields!", error: err });
-      if (doc){
-
-        // If successful, and there was a change in the vote
-        if (typeof vote !== 'undefined'){
-
-          let voterHistory = await Project.findOne(
-            {_id: projectID},
-            {voters:
-              {$elemMatch:
-                {
-                  voter : {$eq : vote.voter}
-                }
+    await Project.findByIdAndUpdate(
+      projectID,
+      { ...req.body },
+      { new: true },
+      async (err, doc) => {
+        if (err)
+          return res
+            .status(500)
+            .send({ resp: "Error in query, check fields!", error: err });
+        if (doc) {
+          // If successful, and there was a change in the vote
+          if (typeof vote !== "undefined") {
+            let voterHistory = await Project.findOne(
+              { _id: projectID },
+              {
+                voters: {
+                  $elemMatch: {
+                    voter: { $eq: vote.voter },
+                  },
+                },
               }
-            });
+            );
 
-          if(voterHistory.voters.length == 0){
-            await Project.findOneAndUpdate(
-              {_id: projectID},
-              {$push:
-                  {
-                    voters : vote
-                  }
-              });
+            if (voterHistory.voters.length == 0) {
+              await Project.findOneAndUpdate(
+                { _id: projectID },
+                {
+                  $push: {
+                    voters: vote,
+                  },
+                }
+              );
+            } else {
+              await Project.findOneAndUpdate(
+                {
+                  _id: projectID,
+                  voters: { $elemMatch: { voter: { $eq: vote.voter } } },
+                },
+                {
+                  $set: {
+                    voters: vote,
+                  },
+                }
+              );
+            }
           }
 
-          else {
-            await Project.findOneAndUpdate(
-              {_id: projectID, voters:{$elemMatch:{voter : {$eq : vote.voter}}}},
-              {"$set" :
-                  {
-                    voters : vote
-                  }
-              });
-          }
+          return res.status(200).send({ resp: doc });
         }
-
-        return res.status(200).send({ resp: doc });
-      } 
-      return res.status(404).send({ resp: `Project ${projectID} not found` });
-    });
+        return res.status(404).send({ resp: `Project ${projectID} not found` });
+      }
+    );
   } catch (error) {
     return;
   }
