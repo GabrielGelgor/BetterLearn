@@ -1,7 +1,0 @@
-module.exports = {
-    MONGO_URI : "mongodb+srv://root:3DucNEgG3or8gROC@cluster0.1lywn.mongodb.net/Database?retryWrites=true&w=majority",
-    COOKIE_KEY : "ajshfb23#!HFJDNjdf983)_0-FFEJN234dfDS",
-    UDEMY_ID : "DDDqwLkYakkP9DDfJRrXD1MczBCAO8CWGxL4JGNg",
-    UDEMY_SECRET : "i576wFt7RonLZDEEmxwFpVopqWFEF2YFk9oS4AxoAXgtwlNe6JswMOY0UJA2ixJLWQslKp7AuHyIy9JAv2xzdMLR5SmVSgKV6FwsN6gLUBHurSgl6M52rMb9zlWrda5Q",
-    UDEMY_ENCODED : "Basic REREcXdMa1lha2tQOUREZkpSclhEMU1jekJDQU84Q1dHeEw0SkdOZzppNTc2d0Z0N1JvbkxaREVFbXh3RnBWb3BxV0ZFRjJZRms5b1M0QXhvQVhndHdsTmU2SnN3TU9ZMFVKQTJpeEpMV1FzbEtwN0F1SHlJeTlKQXYyeHpkTUxSNVNtVlNnS1Y2RndzTjZnTFVCSHVyU2dsNk01MnJNYjl6bFdyZGE1UQ=="
-}
